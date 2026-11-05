@@ -1,0 +1,32 @@
+{
+  "rules": {
+    "party": {
+      ".read": true,
+      ".write": true
+    },
+    "photos": {
+      ".read": true,
+      ".write": true,
+      "$photoId": {
+        ".validate": "newData.hasChildren(['data', 'createdAt'])",
+        "data": { ".validate": "newData.isString() && newData.val().beginsWith('data:image/') && newData.val().length < 900000" },
+        "caption": { ".validate": "newData.isString() && newData.val().length <= 140" },
+        "createdAt": { ".validate": "newData.isNumber()" },
+        "$other": { ".validate": false }
+      }
+    },
+    "rsvps": {
+      ".read": true,
+      "$guestId": {
+        ".write": true,
+        ".validate": "newData.hasChildren(['name', 'status', 'count', 'updatedAt'])",
+        "name": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 80" },
+        "status": { ".validate": "newData.val() === 'yes' || newData.val() === 'no'" },
+        "count": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10" },
+        "note": { ".validate": "newData.isString() && newData.val().length <= 300" },
+        "updatedAt": { ".validate": "newData.isNumber()" },
+        "$other": { ".validate": false }
+      }
+    }
+  }
+}

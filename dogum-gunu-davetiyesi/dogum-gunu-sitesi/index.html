@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Doğum Günü Davetiyesi</title>
+<meta name="description" content="Doğum günü partisi davetiyesi ve katılım formu.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Davetiye bileti: isim + dev yaş rakamı, delikli bilet şeridi, fotoğraflar, geri sayım, LCV kartı. Yönetici paneli sağdan açılır. */
+:root{
+  color-scheme:light;
+  --bg:#F5F2FA; --surface:#FFFFFF; --ink:#1F1530; --muted:#695E7A; --line:#E0D9EB;
+  --accent:#D2346A; --accent-ink:#FFFFFF; --flame:#EFA400; --soft:#FBE6EE;
+  --ok:#1D8456; --ok-soft:#DDF3E8; --no:#9B4545; --no-soft:#F6E4E4; --scrim:rgba(24,14,36,.5);
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Figtree",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root{
+  color-scheme:dark;
+  --bg:#130E1B; --surface:#1D1628; --ink:#F1ECF7; --muted:#A79CB8; --line:#342A47;
+  --accent:#FF6A97; --accent-ink:#1C0C14; --flame:#FFC23D; --soft:#3A1A2A;
+  --ok:#4FCB8F; --ok-soft:#163327; --no:#E79090; --no-soft:#3A1E22; --scrim:rgba(0,0,0,.7)}}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+img{max-width:100%;display:block}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.05}
+.label{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--flame);outline-offset:2px}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:18px;position:relative}
+.brand{display:flex;align-items:center;gap:8px}
+.brand-dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.btn{border:1.5px solid var(--ink);background:transparent;border-radius:999px;padding:8px 16px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn:hover{background:var(--ink);color:var(--bg)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn-primary:hover{filter:brightness(1.07);background:var(--accent);color:var(--accent-ink)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn svg{width:16px;height:16px}
+.pop{position:absolute;right:0;top:64px;z-index:5;width:min(320px,100%);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 12px 32px rgba(0,0,0,.16)}
+
+.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:end;padding-block:28px 32px}
+.hero h1{font-size:clamp(2.6rem,7vw,4.8rem);font-weight:800;letter-spacing:-.02em;margin-top:10px;overflow-wrap:anywhere}
+.hero .lead{max-width:56ch;margin:16px 0 0;color:var(--muted);font-size:1.08rem;white-space:pre-line}
+.age{position:relative;font-family:var(--f-display);font-weight:800;font-size:clamp(6rem,20vw,11rem);line-height:.85;color:var(--accent);letter-spacing:-.04em;padding-top:46px;text-align:right}
+.age small{display:block;font-family:var(--f-mono);font-size:.8rem;letter-spacing:.12em;color:var(--muted);font-weight:500;margin-top:10px;text-transform:uppercase}
+.candle{position:absolute;top:0;right:50%;transform:translateX(50%);width:12px;height:40px;border-radius:3px;background:repeating-linear-gradient(135deg,var(--accent) 0 6px,var(--surface) 6px 12px);border:1.5px solid var(--accent)}
+.candle::before{content:"";position:absolute;left:50%;bottom:calc(100% + 3px);width:12px;height:18px;transform:translateX(-50%);background:var(--flame);border-radius:50% 50% 50% 50%/62% 62% 38% 38%;animation:flick 1.6s ease-in-out infinite alternate;transform-origin:50% 100%}
+@keyframes flick{from{transform:translateX(-50%) scale(1) rotate(-3deg)}to{transform:translateX(-50%) scale(.88,1.08) rotate(3deg)}}
+@media (prefers-reduced-motion:reduce){.candle::before{animation:none}}
+
+.ticket{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:var(--surface);border:1px solid var(--line);border-radius:18px}
+.ticket::before,.ticket::after{content:"";position:absolute;top:50%;width:22px;height:22px;border-radius:50%;background:var(--bg);border:1px solid var(--line);transform:translateY(-50%)}
+.ticket::before{left:-12px;clip-path:inset(0 0 0 50%)} .ticket::after{right:-12px;clip-path:inset(0 50% 0 0)}
+.cell{padding:20px 24px;min-width:0;display:flex;flex-direction:column;gap:6px}
+.cell+.cell{border-left:2px dashed var(--line)}
+.cell .v{font-family:var(--f-display);font-weight:700;font-size:1.35rem;line-height:1.2;overflow-wrap:anywhere}
+.cell .s{color:var(--muted);font-size:.92rem;overflow-wrap:anywhere}
+.cell a{color:var(--accent);font-weight:600;font-size:.92rem}
+.extras{display:flex;flex-wrap:wrap;gap:10px 28px;padding-block:16px 0;color:var(--muted);font-size:.95rem}
+.extras b{color:var(--ink);font-weight:600}
+
+.gallery-sec{padding-block:32px 0}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px}
+.gallery button{padding:0;border:0;background:var(--surface);border-radius:14px;overflow:hidden;cursor:zoom-in;aspect-ratio:1;max-width:100%}
+.gallery img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.gallery button:hover img{transform:scale(1.04)}
+.lightbox{position:fixed;inset:0;z-index:30;background:var(--scrim);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.lightbox img{max-height:80vh;width:auto;border-radius:12px}
+.lightbox p{color:#fff;margin:0;text-align:center;max-width:60ch}
+.lightbox .btn{color:#fff;border-color:#fff}
+
+.countdown{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 22px;padding-block:28px}
+.cd-unit{display:flex;align-items:baseline;gap:6px}
+.cd-num{font-family:var(--f-mono);font-size:clamp(1.8rem,5vw,2.6rem);font-variant-numeric:tabular-nums;font-weight:500}
+.cd-msg{font-family:var(--f-display);font-size:1.4rem;font-weight:700}
+
+.grid2{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:28px;padding-block:8px 56px;align-items:start}
+.card{background:var(--surface);border:1.5px solid var(--ink);border-radius:20px;padding:26px;box-shadow:6px 6px 0 var(--accent)}
+.card h2{font-size:1.9rem}
+.card .sub{color:var(--muted);margin:8px 0 18px}
+form{display:flex;flex-direction:column;gap:14px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field>label,legend{font-weight:600;font-size:.92rem}
+input[type=text],input[type=number],input[type=date],input[type=time],input[type=url],input[type=password],textarea{width:100%;border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px}
+input:focus,textarea:focus{border-color:var(--accent);outline:none}
+textarea{min-height:76px;resize:vertical}
+fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.choice input{position:absolute;opacity:0;pointer-events:none}
+.choice label{border:1.5px solid var(--line);border-radius:12px;padding:14px;text-align:center;font-weight:600;cursor:pointer;background:var(--bg)}
+.choice input:focus-visible+label{outline:3px solid var(--flame);outline-offset:2px}
+#r-yes:checked+label{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+#r-no:checked+label{background:var(--no-soft);border-color:var(--no);color:var(--no)}
+.msg{margin:0;font-size:.92rem;min-height:1.3em}
+.msg.ok{color:var(--ok)} .msg.err{color:var(--no)}
+.saved-pill{display:inline-flex;font-size:.82rem;font-weight:600;padding:4px 10px;border-radius:999px;margin-bottom:6px}
+.saved-pill.yes{background:var(--ok-soft);color:var(--ok)} .saved-pill.no{background:var(--no-soft);color:var(--no)}
+
+.guests h2{font-size:1.5rem}
+.big-count{font-family:var(--f-display);font-weight:800;font-size:3.4rem;line-height:1;color:var(--accent);margin-top:12px;font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding:0;list-style:none}
+.chips li{background:var(--soft);border-radius:999px;padding:6px 12px;font-size:.92rem;overflow-wrap:anywhere}
+.chips li span{color:var(--muted);font-family:var(--f-mono);font-size:.78rem;margin-left:4px}
+.empty{color:var(--muted);font-size:.95rem;margin-top:12px}
+
+.overlay{position:fixed;inset:0;z-index:20;background:var(--scrim);display:flex;justify-content:flex-end}
+.panel{width:min(760px,100%);height:100%;overflow-y:auto;background:var(--bg);padding-block:max(20px,env(safe-area-inset-top,0px)) max(40px,env(safe-area-inset-bottom,0px));padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.panel-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.panel-head h2{font-size:1.8rem}
+.panel-actions{display:flex;gap:8px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:20px;overflow-x:auto}
+.tab{background:none;border:0;border-bottom:3px solid transparent;padding:10px 12px;font-weight:600;cursor:pointer;color:var(--muted);white-space:nowrap}
+.tab[aria-selected=true]{color:var(--ink);border-bottom-color:var(--accent)}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.form-grid .full{grid-column:1/-1}
+.form-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:18px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.stat .n{font-family:var(--f-display);font-weight:800;font-size:2rem;font-variant-numeric:tabular-nums}
+.stat.yes .n{color:var(--ok)} .stat.no .n{color:var(--no)}
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+table{width:100%;border-collapse:collapse;font-size:.93rem;min-width:560px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--f-mono);font-weight:500;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.8rem;font-weight:600}
+.pill.yes{background:var(--ok-soft);color:var(--ok)} .pill.no{background:var(--no-soft);color:var(--no)}
+.del{background:none;border:1px solid var(--line);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:.85rem;white-space:nowrap}
+.del.arm{border-color:var(--no);color:var(--no);font-weight:600}
+.note-cell{max-width:240px;overflow-wrap:anywhere;color:var(--muted)}
+
+.dropzone{display:flex;flex-direction:column;align-items:center;gap:8px;border:2px dashed var(--line);border-radius:16px;padding:26px 16px;text-align:center;cursor:pointer;background:var(--surface)}
+.dropzone.over{border-color:var(--accent);background:var(--soft)}
+.dropzone b{color:var(--accent)}
+.ph-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-top:16px}
+.ph{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.ph img{aspect-ratio:4/3;object-fit:cover;width:100%}
+.ph-body{padding:10px;display:flex;flex-direction:column;gap:8px}
+.ph-body input{padding:7px 9px;font-size:.88rem}
+
+@media (max-width:760px){
+  .hero{grid-template-columns:1fr}
+  .age{text-align:left;font-size:7rem}
+  .candle{right:auto;left:30px;transform:none}
+  .ticket{grid-template-columns:1fr}
+  .ticket::before,.ticket::after{display:none}
+  .cell+.cell{border-left:0;border-top:2px dashed var(--line)}
+  .grid2,.form-grid{grid-template-columns:1fr}
+  .stats{gap:8px} .stat{padding:10px} .stat .n{font-size:1.5rem}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span class="brand-dot"></span><span class="label">Davetiye</span></div>
+    <button class="btn" id="admin-btn" type="button" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      <span id="admin-btn-text">Yönetici Girişi</span>
+    </button>
+    <div class="pop" id="admin-pop" hidden role="dialog" aria-label="Yönetici girişi">
+      <form id="pw-form" novalidate>
+        <div class="field"><label for="pw-input">Yönetici şifresi</label><input type="password" id="pw-input" autocomplete="current-password" maxlength="64"></div>
+        <button class="btn btn-primary" type="submit" id="pw-submit">Giriş yap</button>
+        <p class="msg" id="pw-msg" role="status"></p>
+      </form>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <span class="label" id="v-title">Doğum günü partisi</span>
+      <h1 id="v-honoree">Doğum Günü Partisi</h1>
+      <p class="lead" id="v-message">Parti bilgileri yükleniyor...</p>
+    </div>
+    <div class="age" id="age-box" hidden><span class="candle" aria-hidden="true"></span><span id="v-age"></span><small>yaşına giriyor</small></div>
+  </section>
+
+  <section class="ticket" aria-label="Parti bilgileri">
+    <div class="cell"><span class="label">Tarih</span><span class="v" id="v-date">—</span><span class="s" id="v-weekday"></span></div>
+    <div class="cell"><span class="label">Saat</span><span class="v" id="v-time">—</span><span class="s" id="v-timeend"></span></div>
+    <div class="cell"><span class="label">Yer</span><span class="v" id="v-venue">—</span><span class="s" id="v-address"></span><a id="v-map" href="#" target="_blank" rel="noopener" hidden>Haritada aç ↗</a></div>
+  </section>
+  <div class="extras" id="extras"></div>
+
+  <section class="gallery-sec" id="gallery-sec" hidden>
+    <span class="label">Fotoğraflar</span>
+    <div class="gallery" id="gallery"></div>
+  </section>
+
+  <section class="countdown" id="countdown" aria-live="polite"></section>
+
+  <section class="grid2">
+    <div class="card">
+      <div id="mine-pill"></div>
+      <h2>Geliyor musun?</h2>
+      <p class="sub" id="rsvp-sub">Katılım durumunu bildir. Yanıtını bu cihazdan istediğin zaman değiştirebilirsin.</p>
+      <form id="rsvp-form" novalidate>
+        <div class="field"><label for="r-name">Adın soyadın</label><input type="text" id="r-name" maxlength="80" autocomplete="name" placeholder="Örn. Deniz Yılmaz"></div>
+        <fieldset>
+          <legend>Katılım</legend>
+          <div class="choice">
+            <input type="radio" name="status" id="r-yes" value="yes"><label for="r-yes">Geliyorum</label>
+            <input type="radio" name="status" id="r-no" value="no"><label for="r-no">Gelemiyorum</label>
+          </div>
+        </fieldset>
+        <div class="field" id="r-count-row"><label for="r-count">Kaç kişi geleceksiniz? (sen dahil)</label><input type="number" id="r-count" min="1" max="10" value="1" inputmode="numeric"></div>
+        <div class="field"><label for="r-note">Not <span style="color:var(--muted);font-weight:400">(isteğe bağlı)</span></label><textarea id="r-note" maxlength="300" placeholder="Alerji, gecikme, iyi dilek..."></textarea></div>
+        <button class="btn btn-primary" id="r-submit" type="submit" disabled>Yanıtı gönder</button>
+        <p class="msg" id="r-msg" role="status"></p>
+      </form>
+    </div>
+
+    <aside class="guests">
+      <span class="label">Gelenler</span>
+      <div class="big-count" id="g-count">0</div>
+      <div style="color:var(--muted)">kişi geliyor</div>
+      <ul class="chips" id="g-list"></ul>
+      <p class="empty" id="g-empty">Henüz yanıt yok. İlk yanıt veren sen ol.</p>
+    </aside>
+  </section>
+</div>
+
+<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Fotoğraf">
+  <img id="lb-img" alt="">
+  <p id="lb-cap"></p>
+  <button class="btn" type="button" id="lb-close">Kapat</button>
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="panel-title">
+    <div class="panel-head">
+      <div><span class="label">Yönetici</span><h2 id="panel-title">Yönetim Paneli</h2></div>
+      <div class="panel-actions">
+        <button class="btn" id="logout" type="button">Çıkış yap</button>
+        <button class="btn" id="panel-close" type="button">Kapat</button>
+      </div>
+    </div>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="info" aria-selected="true" type="button">Parti bilgileri</button>
+      <button class="tab" role="tab" data-tab="photos" aria-selected="false" type="button">Fotoğraflar <span id="tab-pcount"></span></button>
+      <button class="tab" role="tab" data-tab="rsvp" aria-selected="false" type="button">Yanıtlar <span id="tab-count"></span></button>
+    </div>
+
+    <div id="pane-info">
+      <form id="admin-form" novalidate>
+        <div class="form-grid">
+          <div class="field"><label for="a-honoree">Doğum günü olan kişi</label><input type="text" id="a-honoree" maxlength="60" placeholder="Örn. Elif"></div>
+          <div class="field"><label for="a-age">Kaçıncı yaş?</label><input type="number" id="a-age" min="1" max="120" placeholder="Örn. 30"></div>
+          <div class="field full"><label for="a-title">Başlık etiketi</label><input type="text" id="a-title" maxlength="60" placeholder="Doğum günü partisi"></div>
+          <div class="field full"><label for="a-message">Davet mesajı</label><textarea id="a-message" maxlength="600" placeholder="Misafirlere kısa bir mesaj"></textarea></div>
+          <div class="field"><label for="a-date">Tarih</label><input type="date" id="a-date"></div>
+          <div class="field"><label for="a-deadline">Son yanıt tarihi</label><input type="date" id="a-deadline"></div>
+          <div class="field"><label for="a-time">Başlangıç saati</label><input type="time" id="a-time"></div>
+          <div class="field"><label for="a-end">Bitiş saati</label><input type="time" id="a-end"></div>
+          <div class="field full"><label for="a-venue">Mekan adı</label><input type="text" id="a-venue" maxlength="80" placeholder="Örn. Bahçe Kafe"></div>
+          <div class="field full"><label for="a-address">Adres</label><input type="text" id="a-address" maxlength="160"></div>
+          <div class="field full"><label for="a-map">Harita bağlantısı</label><input type="url" id="a-map" maxlength="400" placeholder="https://maps.google.com/..."></div>
+          <div class="field"><label for="a-dress">Kıyafet</label><input type="text" id="a-dress" maxlength="80" placeholder="Örn. Rahat, beyaz tema"></div>
+          <div class="field"><label for="a-contact">İletişim</label><input type="text" id="a-contact" maxlength="80" placeholder="Örn. 0555 123 45 67"></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit" id="a-save">Kaydet</button>
+          <p class="msg" id="a-msg" role="status"></p>
+        </div>
+      </form>
+    </div>
+
+    <div id="pane-photos" hidden>
+      <label class="dropzone" id="dropzone" for="p-input">
+        <b>Fotoğraf ekle</b>
+        <span style="color:var(--muted);font-size:.92rem">Tıkla ya da fotoğrafları buraya sürükle. En fazla 12 fotoğraf; büyük fotoğraflar otomatik küçültülür.</span>
+      </label>
+      <input type="file" id="p-input" accept="image/*" multiple hidden>
+      <p class="msg" id="p-msg" role="status" style="margin-top:10px"></p>
+      <div class="ph-grid" id="ph-grid"></div>
+      <p class="empty" id="p-empty">Henüz fotoğraf yok.</p>
+    </div>
+
+    <div id="pane-rsvp" hidden>
+      <div class="stats">
+        <div class="stat yes"><span class="label">Geliyor</span><div class="n" id="s-yes">0</div></div>
+        <div class="stat"><span class="label">Toplam kişi</span><div class="n" id="s-people">0</div></div>
+        <div class="stat no"><span class="label">Gelmiyor</span><div class="n" id="s-no">0</div></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>İsim</th><th>Durum</th><th>Kişi</th><th>Not</th><th>Tarih</th><th></th></tr></thead>
+          <tbody id="a-rows"></tbody>
+        </table>
+      </div>
+      <p class="empty" id="a-empty">Henüz yanıt gelmedi.</p>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
